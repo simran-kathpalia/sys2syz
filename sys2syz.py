@@ -6,7 +6,7 @@ from core.bear import *
 from core.extractor import Extractor, Ioctl
 from core.c2xml import *
 from core.descriptions import *
-from core.syscall import *
+#from core.syscall import *
 
 # Default imports 
 import argparse
@@ -15,8 +15,8 @@ import sys
 import string
 
 class Sys2syz(object):
-    NETBSD = 1
-    supported_os = {'NetBSD': NETBSD}
+    FREEBSD = 1
+    supported_os = {'FreeBSD': FREEBSD}
 
     def __init__(self, input_type, target, compile_commands, os_name, log_level):
         self.input_type = input_type

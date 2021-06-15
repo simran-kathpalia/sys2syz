@@ -13,7 +13,8 @@ class Ioctl(object):
     IOW = 2
     IOR = 3
     IOWR = 4
-    types = {IO: 'null', IOW: 'in', IOR: 'out', IOWR: 'inout'}
+    IOWINT = 5
+    types = {IO: 'null', IOW: 'in', IOR: 'out', IOWR: 'inout', IOWINT: 'null'}
 
     def __init__(self, gtype, filename, command, description=None):
         self.type = gtype
@@ -29,8 +30,9 @@ class Extractor(object):
     iow = re.compile(r"#define\s+(.*)\s+_IOW\((.*),\s+(.*),\s+(.*)\).*") #regex for IOW_
     ior = re.compile(r"#define\s+(.*)\s+_IOR\((.*),\s+(.*),\s+(.*)\).*") #regex for IOR_
     iowr = re.compile(r"#define\s+(.*)\s+_IOWR\((.*),\s+(.*),\s+(.*)\).*") #regex for IOWR_
+    iowint = re.compile(r"#define\s+(.*)\s+_IOWINT\((.*)\).*") # regex for IOWINT_ 
     macros = re.compile(r"#define\s*\t*([A-Z_0-9]*)\t*\s*.*")
-    more_macros = re.compile(r"#define(\s|\t)+([A-Z_0-9]*)[\t|\s]+(?!_IOWR|_IOR|_IOW|_IO|\()[0-9]*x?[a-z0-9]*")#define(\s|\t)+([A-Z_0-9]*)[\t\s]+([^_IOWR{][0-9]*)")#define(\s|\t)+([^_][A-Z_0-9]*)\t*\s*.*")
+    more_macros = re.compile(r"#define(\s|\t)+([A-Z_0-9]*)[\t|\s]+(?!_IOWINT|_IOWR|_IOR|_IOW|_IO|\()[0-9]*x?[a-z0-9]*")#define(\s|\t)+([A-Z_0-9]*)[\t\s]+([^_IOWR{][0-9]*)")#define(\s|\t)+([^_][A-Z_0-9]*)\t*\s*.*")
     
     def __init__(self, sysobj):
         self.sysobj = sysobj
@@ -42,7 +44,7 @@ class Extractor(object):
         self.target_dir = join(os.getcwd(), "out/preprocessed/", basename(self.target))
         
         if not exists(self.target_dir):
-            os.mkdir(self.target_dir)
+            os.makedirs(self.target_dir)
         self.ioctl_file = ""
 
     def get_ioctls(self):
@@ -80,6 +82,11 @@ class Extractor(object):
                 iowr_match = self.iowr.match(line)
                 if iowr_match:
                     self.ioctls.append(Ioctl(Ioctl.IOWR, file, iowr_match.groups()[0].strip(), iowr_match.groups()[-1]))
+                    continue
+                
+                iowint_match = self.iowint.match(line)
+                if iowint_match:
+                    self.ioctls.append(Ioctl(Ioctl.IOWINT, file, iowint_match.groups()[0].strip()))
                     continue
 
     @property

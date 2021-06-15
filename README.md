@@ -127,3 +127,13 @@ Features yet to be implemented:
 - Calculating Attributes for structs and unions
 
 This tool is developed by Ayushi Sharma
+
+## 8. SUPPORT FOR FREEBSD
+
+Added support to get descriptions for FreeBSD syscalls and ioctl calls for syzkaller in linux environment. 
+
+To build, run the setup.sh script in a freebsd host(could be a vm) with same path for src as your freebsd src will be in linux and scp the json file from FreeBSD to Linux.
+The usage is same as given.
+
+The modifications will soon be integrated with the original repository and will support both NetBSD and FreeBSD.
+
